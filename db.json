@@ -1,0 +1,61 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Андрей",
+      "login": "andrey",
+      "password": "andrey"
+    },
+    {
+      "id": 2,
+      "name": "Неандрей",
+      "login": "neandrey",
+      "password": "neandrey"
+    }
+  ],
+  "contacts": [
+    {
+      "id": 2,
+      "user_id": 1,
+      "name": "Валерчик",
+      "number": "34234234",
+      "email": "valera@gmail.com"
+    },
+    {
+      "id": 3,
+      "user_id": 2,
+      "name": "Жора",
+      "number": "342342233",
+      "email": "jora@gmail.com"
+    },
+    {
+      "id": 4,
+      "user_id": 2,
+      "name": "Мстислав",
+      "number": "34234234",
+      "email": "lol@gmail.com"
+    },
+    {
+      "user_id": "1",
+      "name": "Евдаким",
+      "number": "555-654-22",
+      "email": "Evdak@gmail.com",
+      "id": 6
+    },
+    {
+      "user_id": "1",
+      "name": "Митрофан",
+      "number": "555-654-12",
+      "email": "Metro@gmail.com",
+      "id": 7
+    }
+  ,
+    {
+      "user_id": "1",
+      "name": "Данила",
+      "number": "555-654",
+      "email": "KreiziDanila@gmail.com",
+      "id": 8
+    }
+  ]
+}
