@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <new-contact @addContact="newContact" v-if="getAddNewContact"></new-contact>
     <div class="header">
       <span> Привет {{ name }}</span>
       <button class="btn btn-warning" @click="logout">
@@ -7,19 +8,28 @@
       </button>
     </div>
     <div>
-      <div class="add-contact">Добавить контакт</div>
+      <div @click="addContact" class="add-contact">Добавить контакт</div>
       <form class="form-inline d-flex justify-content-center md-form form-sm mt-0">
         <i class="fas fa-search" aria-hidden="true"></i>
         <input @input="searchContact($event)" class="form-control form-control-sm ml-3 w-75" type="text" placeholder="Search"
                aria-label="Search">
       </form>
       <div class="contacts-table">
-        <div class="contacts" v-for="contact in contacts"
+        <div class="contacts" v-for="(contact, key) in contacts"
              :key="contact.id"
         >
-          <div>{{ contact.name }}</div>
-          <div>{{ contact.number }}</div>
-          <div>{{ contact.email }}</div>
+          <div @dblclick="edit($event, contact.id)">
+            <span :data-id="contact.id">{{ contact.name }}</span>
+            <input @blur="closeInput($event)" @keydown="editFieldContact($event, contact.id, key)" :data-id="contact.id" v-model="contact.name" class="inputInvisible" type="text">
+          </div>
+          <div @dblclick="edit($event, contact.id)">
+            <span :data-id="contact.id">{{ contact.number }}</span>
+            <input @blur="closeInput($event)" @keydown="editFieldContact($event, contact.id, key)" :data-id="contact.id" v-model="contact.number" class="inputInvisible" type="text">
+          </div>
+          <div @dblclick="edit($event, contact.id)">
+            <span :data-id="contact.id">{{ contact.email }} </span>
+            <input @blur="closeInput($event)" @keydown="editFieldContact($event, contact.id, key)" :data-id="contact.id" v-model="contact.email" class="inputInvisible" type="text">
+          </div>
           <div @click="deleteContact(contact.id)" class="delete">&#10060;</div>
         </div>
       </div>
@@ -28,22 +38,25 @@
 </template>
 
 <script>
-  import {mapActions, mapGetters} from 'vuex'
+  import newContact from '../components/NewContact.vue'
+  import {mapActions, mapGetters, mapMutations} from 'vuex'
   import axios from 'axios'
 
   export default {
     name: 'Home',
     components: {
+      newContact
     },
     data() {
       return{
         name: localStorage.getItem('name'),
-        contacts: []
+        contacts: [],
       }
     },
-    computed: mapGetters(['getStateContact']),
+    computed: mapGetters(['getStateContact', 'getAddNewContact']),
     methods: {
       ...mapActions(['getContacts']),
+      ...mapMutations(['switchAddNewContact']),
       logout() {
         localStorage.setItem('auth', false);
         this.$router.push('auth');
@@ -70,7 +83,7 @@
         await this.getContacts();
         this.contacts = this.getStateContact;
         if (e.target.value.length !== 0) {
-          this.contacts =  this.contacts.filter(elem => {
+          this.contacts = this.contacts.filter(elem => {
             if (
                     !elem.name.startsWith(e.target.value) &&
                     !elem.email.startsWith(e.target.value) &&
@@ -81,6 +94,67 @@
             return elem;
           })
         }
+      },
+      addContact() {
+        this.switchAddNewContact(true);
+      },
+      async newContact() {
+        await this.getContacts();
+        this.contacts = this.getStateContact;
+      },
+      edit(e, id) {
+        if (e.target.tagName === 'INPUT') {
+          return
+        }
+        let inp;
+        let span;
+        if (e.target.tagName === 'DIV') {
+          inp = e.target.querySelector('input');
+          span = e.target.querySelector('span');
+        } else {
+          inp = e.target.parentNode.querySelector('input');
+          span = e.target;
+        }
+
+        inp.classList.remove('inputInvisible');
+        inp.classList.add('inputVisible');
+        inp.focus();
+        span.style = 'display: none';
+        this._closeEditInput(inp.value, id)
+      },
+
+      editFieldContact(e, id, key) {
+        if (e.code === 'Enter') {
+          axios.patch(`http://localhost:3000/contacts/${id}`, {[key]: e.target.value})
+          this.closeInput(e)
+        }
+      },
+
+      closeInput(e) {
+        e.target.classList.remove('inputVisible');
+        e.target.classList.add('inputInvisible');
+        e.target.parentNode.querySelector('span').style = 'dispay:none';
+      },
+
+      _closeEditInput(value, id) {
+        let table = document.querySelector('.contacts-table');
+        let spans = table.querySelectorAll('span');
+        let inputs = table.querySelectorAll('input');
+        this._forEachInputAndSpan(spans, inputs, value, id)
+      },
+      _forEachInputAndSpan(spans, inputs, value) {
+        [...spans].forEach(elem => {
+           if (getComputedStyle(elem).display === 'none' && elem.innerHTML.trim() !== value ) {
+              elem.style = 'display:block';
+           }
+        });
+
+        [...inputs].forEach(elem => {
+          if (elem.classList.contains('inputVisible') && elem.value !== value ){
+            elem.classList.add('inputInvisible');
+            elem.classList.remove('inputVisible');
+          }
+        })
       }
     },
     async mounted() {
@@ -165,5 +239,13 @@
   }
   .add-contact:hover{
     cursor: pointer;
+  }
+
+  .inputInvisible {
+    display: none;
+  }
+
+  .inputVisible {
+    display: block;
   }
 </style>

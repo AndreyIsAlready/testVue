@@ -1,21 +1,24 @@
 <template>
-  <div class="home">
-    <div class="field">
-      <div class="form-group">
-        <label for="login">логин</label>
-        <input id="login" class="form-control" type="text" v-model="login" placeholder="введите логин">
+  <div>
+      <div class="home">
+        <div class="field">
+          <router-link class="link" :to="{name: 'register'}">регистрация</router-link>
+          <div class="form-group">
+            <label for="login">логин</label>
+            <input id="login" class="form-control" type="text" v-model="login" placeholder="введите логин">
+          </div>
+        </div>
+        <div class="field">
+          <div class="form-group">
+            <label for="password">пароль</label>
+            <input id="password" class="form-control" type="password" v-model="password" placeholder="введите пароль">
+          </div>
+        </div>
+        <div class="field">
+          <button @click="submit" class="btn btn-primary">войти</button>
+          <span class="error" v-if="incorrect">Неверный логин или пароль</span>
+        </div>
       </div>
-    </div>
-    <div class="field">
-      <div class="form-group">
-        <label for="password">пароль</label>
-        <input id="password" class="form-control" type="password" v-model="password" placeholder="введите пароль">
-      </div>
-    </div>
-    <div class="field">
-      <button @click="submit" class="btn btn-primary">войти</button>
-      <span class="error" v-if="incorrect">Неверный логин или пароль</span>
-    </div>
   </div>
 </template>
 
@@ -96,5 +99,9 @@ export default {
 
   .error{
     color: red;
+  }
+
+  .link{
+    margin-left: 50%;
   }
 </style>
