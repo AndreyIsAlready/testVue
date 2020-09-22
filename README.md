@@ -6,7 +6,7 @@
 ```
 npm install
 ```
-### Install
+### Install and use
 ```
 JSON Server - npm install -g json-server
 
